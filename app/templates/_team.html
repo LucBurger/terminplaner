@@ -1,9 +1,11 @@
+<!-- Eigenentwicklung -->
 <table class="table table-hover">
     <tr>
         <td>
             <a href="{{ url_for('team', teamname=team.teamname) }}">
                 {{ team.teamname }}
             </a>
+            <p>{{ team.beschreibung }}</p>
         </td>
     </tr>
 </table>

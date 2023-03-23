@@ -1,3 +1,4 @@
+<!-- Übernommen aus den Beispielen -->
 {% extends 'bootstrap/base.html' %}
 
 {% block title %}
@@ -19,8 +20,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('index') }}">Home</a></li>
-                    <li><a href="{{ url_for('explore') }}">Explore</a></li>
-                    <li><a href="{{ url_for('teams') }}">Team</a></li>
+                    <li><a href="{{ url_for('teams') }}">Teams</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_anonymous %}

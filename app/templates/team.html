@@ -1,3 +1,4 @@
+<!-- Eigenentwicklung -->
 {% extends "base.html" %}
 
 {% block app_content %}
@@ -7,15 +8,25 @@
             <td>
                 <h1>Team: {{ team.teamname }}</h1>
                 <br>
-                Mitglieder: { team.mitglieder }
+                <b>Beschreibung:</b> 
+                <p>{{team.beschreibung}}</p>
                 <br>
-                John
+                <b>Mitglieder:</b> 
+                <p></p>
+                <br>
                 <p>
                     <form action="{{ url_for('beitreten', teamname=team.teamname) }}" method="post">
                         {{ form.hidden_tag() }}
                         {{ form.submit(value='Beitreten', class_='btn btn-default') }}
                     </form>
                 </p>
+                <p>
+                    <form action="{{ url_for('austreten', teamname=team.teamname) }}" method="post">
+                        {{ form.hidden_tag() }}
+                        {{ form.submit(value='Austreten', class_='btn btn-default') }}
+                    </form>
+                </p>          
+                <a href="{{ url_for('termin', teamname=team.teamname) }}"> Termine </a>                
                 {% for mitglied in mitglieder %}
                     {% include '_mitglieder.html' %}
                 {% endfor %}  

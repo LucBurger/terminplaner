@@ -1,0 +1,19 @@
+<!-- Eigenentwicklung -->
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <table class="table table-hover">
+        <h1>Neuen Termin für {{ team.teamname }} erstellen</h1>
+        <tr>
+            <td>
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ wtf.quick_form(form) }}
+                    </div>
+                </div>
+                <a href="{{ url_for('termin', teamname=team.teamname) }}"> Zurück zu Termine </a>
+            </td>
+        </tr>
+    </table>
+{% endblock %}

@@ -6,84 +6,68 @@ from hashlib import md5
 from time import time
 import jwt
 
-followers = db.Table('followers',
-    db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
-)
-
+#Eigenentwicklung
 mitglieder = db.Table('mitglieder',
     db.Column('mitglieder_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('mitglied_id', db.Integer, db.ForeignKey('team.id'))
 )
 
+#Übernommen aus den Beispielen mit Anpassungen
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-    followed = db.relationship(
-        'User', secondary=followers,
-        primaryjoin=(followers.c.follower_id == id),
-        secondaryjoin=(followers.c.followed_id == id),
-        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic'
-    )
-    mitglied = db.relationship(
-        'Team', secondary=mitglieder,
-        primaryjoin=(mitglieder.c.mitglieder_id == id),
-        secondaryjoin=(mitglieder.c.mitglied_id == id),
-        backref=db.backref('mitglieder', lazy='dynamic'), lazy='dynamic', viewonly=True
-    )
+    mitglied = db.relationship('Team', secondary=mitglieder, backref=db.backref('mitglied_von'))
 
+#Übernommen aus den Beispielen
     def __repr__(self):
         return '<User {}>'.format(self.username)
-    
+
+#Übernommen aus den Beispielen
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
+#Übernommen aus den Beispielen
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
+
+#Übernommen aus den Beispielen    
     def avatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
             digest, size)
 
-    def is_following(self, user):
-        return self.followed.filter(
-            followers.c.followed_id == user.id).count() > 0   
-    
+#Eigenentwicklung
     def beitreten(self, team):
-        if not self.is_member(team):
-            self.mitglied.append(team)
+        self.mitglied.append(team)
 
+#Eigenentwicklung
     def austreten(self, team):
-        if self.is_member(team):
-            self.mitglied.remove(team)
+        self.mitglied.remove(team)
 
-    def is_member(self, team):
-        return self.mitglied.filter(
-            mitglieder.c.mitglied_id == team.id).count() > 0 
-
+#Eigenentwicklung
     def member_of_teams(self):
         mitglied = Team.query.join(
             mitglieder, (mitglieder.c.mitglied_id == Team.id)).filter(
                 mitglieder.c.mitglieder_id == self.id)
 
-    def followed_posts(self):
-        followed = Post.query.join(
-            followers, (followers.c.followed_id == Post.user_id)).filter(
-                followers.c.follower_id == self.id)
-        own = Post.query.filter_by(user_id=self.id)
-        return followed.union(own).order_by(Post.timestamp.desc())
-    
+#Eigenentwicklung    
+    def mitglied_teams(self):
+        mitglied = Team.query.join(
+            mitglieder, (mitglieder.c.mitglied_id == Team.mitglieder)).filter(
+                mitglieder.c.mitglieder_id == self.id)
+        return mitglied.order_by(Team.id.asc())
+
+ #Übernommen aus den Beispielen   
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
             app.config['SECRET_KEY'], algorithm='HS256')
-    
+
+#Übernommen aus den Beispielen    
     @staticmethod
     def verify_reset_password_token(token):
         try:
@@ -92,38 +76,34 @@ class User(UserMixin, db.Model):
         except:
             return
         return User.query.get(id)
-     
+
+#Übernommen aus den Beispielen     
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
-   
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.String(140))
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __repr__(self):
-        return '<Post {}>'.format(self.body)
-    
+#Eigenentwicklung
 class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     teamname = db.Column(db.String(64), index=True, unique=True)
-    termine = db.relationship('Termin', backref='team', lazy='dynamic')
+    beschreibung = db.Column(db.String(140))
+    termine = db.relationship('Termin', backref='team_termine', lazy='dynamic')
 
     def __repr__(self):
-        return '<Team {}>'.format(self.teamname)
+        return '<Team {} {}>'.format(self.teamname, self.beschreibung)
 
     def avatar(self, size):
         digest = md5(self.teamname.lower().encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
             digest, size)
-    
+
+#Eigenentwicklung 
 class Termin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     terminname = db.Column(db.String(64))
-    datum = db.Column(db.DateTime)
-    zeit = db.Column(db.DateTime)
+    beschreibung = db.Column(db.String(140))
+    datum = db.Column(db.Date)
+    zeit = db.Column(db.Time)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
 
     def __repr__(self):

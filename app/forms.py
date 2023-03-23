@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, DateField, TimeField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
 from app.models import User
+from datetime import datetime, date
 
 #Übernommen aus den Beispielen
 class LoginForm(FlaskForm):
@@ -49,7 +50,7 @@ class EditProfileForm(FlaskForm):
             if user is not None:
                 raise ValidationError('Please use a different username.')
 
-
+#Übernommen aus den Beispielen
 class EmptyForm(FlaskForm):
     submit = SubmitField('Submit')
 
@@ -74,4 +75,17 @@ class ResetPasswordForm(FlaskForm):
 #Eigenentwicklung
 class CreateTeam(FlaskForm):
     teamname = StringField('Teamname', validators=[DataRequired()])
+    beschreibung = StringField('Beschreibung', validators=[DataRequired()])
     submit = SubmitField('Create Team')
+
+class CreateTermin(FlaskForm):
+    terminname = StringField('Terminname', validators=[DataRequired()])
+    beschreibung = StringField('Beschreibung', validators=[DataRequired()])
+    datum = DateField('Datum', format='%Y-%m-%d', validators=[DataRequired()])
+    zeit = TimeField('Zeit', validators=[DataRequired()])
+    submit = SubmitField('Termin erstellen')
+
+    '''def validate_datum(self, datum):
+        datum = date.today()
+        if self.datum < datum:
+            raise ValidationError('Der Termin kann nicht in der Vergangenheit liegen.')'''

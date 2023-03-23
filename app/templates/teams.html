@@ -1,16 +1,32 @@
+<!-- Eigenentwicklung -->
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <h1>Team Übersicht</h1>
-    <p>Hier sehen sie alle Teams</p>
-    {% for team in teams %}
-        {% include '_team.html' %}
-    {% endfor %}
-    <p><a href="{{ url_for('index') }}">Back</a></p>
+    <h1>Team Übersicht</h1>    
     <div class="row">
         <div class="col-md-4">
             {{ wtf.quick_form(form) }}
         </div>
     </div>
+    <br>
+    <p>Hier sehen sie alle Teams</p>
+    {% for team in teams %}
+        {% include '_team.html' %}
+    {% endfor %}
+    <nav aria-label="...">
+        <ul class="pager">
+        <li class="previous{% if not prev_url %} disabled{% endif %}">
+        <a href="{{ prev_url or '#' }}">
+        <span aria-hidden="true">&larr;</span> Zurück
+        </a>
+        </li>
+        <li class="next{% if not next_url %} disabled{% endif %}">
+        <a href="{{ next_url or '#' }}">
+        Weiter <span aria-hidden="true">&rarr;</span>
+        </a>
+        </li>
+        </ul>
+        </nav>
+    <p><a href="{{ url_for('index') }}">Back</a></p>
 {% endblock %}
