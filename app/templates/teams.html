@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>Team Übersicht</h1>
+    <p>Hier sehen sie alle Teams</p>
+    {% for team in teams %}
+        {% include '_team.html' %}
+    {% endfor %}
+    <p><a href="{{ url_for('index') }}">Back</a></p>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <table class="table table-hover">
+        <tr>
+            <td width="256px"><img src="{{ team.avatar(256) }}"></td>
+            <td>
+                <h1>Team: {{ team.teamname }}</h1>
+                <br>
+                Mitglieder: { team.mitglieder }
+                <br>
+                John
+                <p>
+                    <form action="{{ url_for('beitreten', teamname=team.teamname) }}" method="post">
+                        {{ form.hidden_tag() }}
+                        {{ form.submit(value='Beitreten', class_='btn btn-default') }}
+                    </form>
+                </p>
+                {% for mitglied in mitglieder %}
+                    {% include '_mitglieder.html' %}
+                {% endfor %}  
+            </td>
+        </tr>
+    </table>
+{% endblock %}
